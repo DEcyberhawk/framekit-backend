@@ -23,7 +23,6 @@ app.listen(PORT, () =>
   console.log(`✅ Backend running on http://localhost:${PORT}`)
 );
 express = require('express');
-const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
