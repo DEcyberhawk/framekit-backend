@@ -3,33 +3,27 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
-// Load environment variables
 dotenv.config();
-
-// Connect to MongoDB
 connectDB();
 
-// Initialize express app
 const app = express();
-
-// Middleware
 app.use(cors());
-app.use(express.json()); // Parses JSON request bodies
+app.use(express.json());
 
-// Import routes
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
+const invoiceRoutes = require("./routes/invoiceRoutes");
 
-// Mount routes
+app.use("/api/invoices", invoiceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
-// Root endpoint
 app.get("/", (req, res) => {
-  res.send("✅ FrameKit Backend API is Live");
+  res.send("✅ FrameKit Backend API is Live and Operational");
 });
 
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on http://localhost:${PORT}`);
