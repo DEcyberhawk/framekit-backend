@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
+const invoiceRoutes = require("./routes/invoiceRoutes");
+
 
 dotenv.config();
 connectDB();
@@ -15,10 +17,12 @@ const userRoutes = require("./routes/userRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const invoiceRoutes = require("./routes/invoiceRoutes");
 
+
+app.use("/api/analytics", analyticsRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/analytics", analyticsRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("✅ FrameKit Backend API is Live and Operational");

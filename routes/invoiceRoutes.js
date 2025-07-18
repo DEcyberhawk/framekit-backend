@@ -1,38 +1,27 @@
 const express = require("express");
-const PDFDocument = require("pdfkit");
-const User = require("../models/User"); // Optional: if you're using user DB
 const router = express.Router();
+const Invoice = require("../models/Invoice");
+const User = require("../models/User");
 
-// Dynamic invoice generator
-router.get("/generate", async (req, res) => {
-  const {
-    name = "Max Collins Botchway",
-    email = "maxcollinsbotchway88@gmail.com",
-    plan = "FrameKit Pro",
-    amount = "89.00",
-    invoiceId = "INV-" + Math.floor(Math.random() * 100000),
-  } = req.query;
+// GET all invoices
+router.get("/", async (req, res) => {
+  try {
+    const invoices = await Invoice.find().populate("userId", "name email");
+    res.json(invoices);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch invoices" });
+  }
+});
 
-  const doc = new PDFDocument();
-  res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Content-Disposition", `attachment; filename=${invoiceId}.pdf`);
-  doc.pipe(res);
-
-  doc.fontSize(18).text("🧾 FrameKit Invoice", { align: "center" });
-  doc.moveDown();
-  doc.fontSize(12).text("Invoice ID: " + invoiceId);
-  doc.text("Invoice Date: " + new Date().toLocaleDateString());
-  doc.moveDown();
-  doc.text(`Billed To:`);
-  doc.text(name);
-  doc.text(`Email: ${email}`);
-  doc.moveDown();
-  doc.text(`Description: ${plan}`);
-  doc.text(`Amount: €${amount}`);
-  doc.moveDown();
-  doc.text("Thank you for your purchase!");
-
-  doc.end();
+// POST new invoice
+router.post("/", async (req, res) => {
+  try {
+    const { userId, amount, status } = req.body;
+    const invoice = await Invoice.create({ userId, amount, status });
+    res.status(201).json(invoice);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to create invoice" });
+  }
 });
 
 module.exports = router;
