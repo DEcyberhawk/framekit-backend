@@ -6,14 +6,12 @@ const cors = require("cors");
 // Routes
 const authRoutes = require("./routes/authRoutes");
 const brandKitRoutes = require("./routes/brandKitRoutes");
-const notificationRoutes = require("./routes/notifications"); // ✅ NEW
-const userRoutes = require("./routes/users"); // ✅ if you created the users CRUD router we wrote
+const notificationRoutes = require("./routes/notifications");
+const userRoutes = require("./routes/users");
 
 dotenv.config();
 
-// Debug log to verify MONGO_URI is loaded
 console.log("✅ Loaded MONGO_URI:", process.env.MONGO_URI);
-
 if (!process.env.MONGO_URI) {
   console.error("❌ MONGO_URI is missing in .env file");
   process.exit(1);
@@ -26,7 +24,7 @@ const app = express();
 // ─────────────────────────────────────
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(",") || "*", // e.g. "http://localhost:5173,https://framekit-app.netlify.app"
+    origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
     credentials: true,
   })
 );
@@ -37,13 +35,41 @@ app.use(express.json());
 // ─────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/brandkits", brandKitRoutes);
-app.use("/api/notifications", notificationRoutes); // ✅ NEW
-app.use("/api/users", userRoutes); // ✅ if present
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/users", userRoutes);
 
-// Health / test routes
+// ✅ HTML response for root route to fix browser security warning
 app.get("/", (req, res) => {
-  res.send("✅ FrameKit Backend API is Live");
+  res.setHeader("Content-Type", "text/html");
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <title>FrameKit Backend API</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+            background-color: #f0f0f0;
+          }
+          h1 {
+            color: #2c3e50;
+          }
+          p {
+            color: #34495e;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>✅ FrameKit Backend API is Live</h1>
+        <p>This server powers the secure backend for the FrameKit platform.</p>
+      </body>
+    </html>
+  `);
 });
+
 app.get("/health", (req, res) => {
   res.json({ status: "ok", uptime: process.uptime(), timestamp: Date.now() });
 });
@@ -74,7 +100,6 @@ mongoose
   .then(() => {
     console.log("✅ MongoDB connected");
     const PORT = process.env.PORT || 5000;
-
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
